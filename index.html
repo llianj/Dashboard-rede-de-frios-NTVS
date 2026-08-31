@@ -6,208 +6,31 @@
 <title>Rede de Frios — Núcleo de Vigilância Epidemiológica e Zoonoses</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg: #EEF4F4;
-    --surface: #FFFFFF;
-    --surface-2: #F5FAFA;
-    --primary: #0F3D3E;
-    --primary-light: #1F6F73;
-    --ice: #4FB4C4;
-    --text: #142222;
-    --text-muted: #5C7373;
-    --border: #D7E4E4;
-    --warning: #C97A1E;
-    --warning-bg: #FBF0DD;
-    --critical: #C1394A;
-    --critical-bg: #FBE4E7;
-    --ok: #2F8F63;
-    --ok-bg: #E4F5EC;
-    --radius: 10px;
-    --shadow: 0 2px 10px rgba(15,61,62,0.06), 0 1px 2px rgba(15,61,62,0.08);
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font-family:'IBM Plex Sans', sans-serif;
-    -webkit-font-smoothing:antialiased;
-  }
-  h1,h2,h3,.display{
-    font-family:'Space Grotesk', sans-serif;
-    letter-spacing:-0.01em;
-  }
-  .mono{font-family:'IBM Plex Mono', monospace;}
-
-  .app{max-width:1180px; margin:0 auto; padding:28px 24px 60px;}
-
-  .header{
-    display:flex; justify-content:space-between; align-items:flex-end;
-    gap:20px; margin-bottom:24px; padding-bottom:20px;
-    border-bottom:1px solid var(--border);
-  }
-  .header .eyebrow{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:11.5px; letter-spacing:0.12em; text-transform:uppercase;
-    color:var(--ice); font-weight:600; margin-bottom:6px;
-  }
-  .header h1{font-size:26px; font-weight:700; color:var(--primary); margin:0;}
-  .header .sub{color:var(--text-muted); font-size:13.5px; margin-top:4px;}
-  .header-right{text-align:right; font-size:12px; color:var(--text-muted); font-family:'IBM Plex Mono', monospace;}
-  .sync-dot{display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--ok); margin-right:6px; box-shadow:0 0 0 3px var(--ok-bg);}
-  .sync-dot.off{background:var(--critical); box-shadow:0 0 0 3px var(--critical-bg);}
-
-  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:26px;}
-  .stat-card{
-    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
-    padding:16px 18px; box-shadow:var(--shadow);
-  }
-  .stat-card .num{font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; color:var(--primary); line-height:1;}
-  .stat-card .label{font-size:12px; color:var(--text-muted); margin-top:6px; font-weight:500;}
-  .stat-card.warn .num{color:var(--warning);}
-  .stat-card.crit .num{color:var(--critical);}
-
-  .controls{display:flex; gap:12px; margin-bottom:18px; flex-wrap:wrap; align-items:center;}
-  .search{flex:1; min-width:220px; position:relative;}
-  .search input{
-    width:100%; padding:10px 14px 10px 36px; border-radius:8px; border:1px solid var(--border);
-    background:var(--surface); font-size:14px; font-family:inherit; color:var(--text);
-  }
-  .search input:focus{outline:2px solid var(--ice); outline-offset:1px; border-color:var(--ice);}
-  .search svg{position:absolute; left:11px; top:50%; transform:translateY(-50%); opacity:0.45;}
-  select.filter{
-    padding:10px 12px; border-radius:8px; border:1px solid var(--border); background:var(--surface);
-    font-family:inherit; font-size:13.5px; color:var(--text);
-  }
-  .btn-primary{
-    background:var(--primary); color:#fff; border:none; padding:10px 18px; border-radius:8px;
-    font-family:inherit; font-weight:600; font-size:14px; cursor:pointer; transition:background 0.15s;
-    display:flex; align-items:center; gap:8px;
-  }
-  .btn-primary:hover{background:var(--primary-light);}
-  .btn-primary:disabled{opacity:0.5; cursor:not-allowed;}
-
-  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:14px;}
-  .card{
-    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
-    padding:16px; box-shadow:var(--shadow); display:flex; gap:14px; position:relative;
-  }
-  .vial{
-    width:26px; height:64px; border:2px solid var(--primary); border-top:none;
-    border-radius:0 0 8px 8px; position:relative; flex-shrink:0; background:var(--surface-2);
-    overflow:hidden; margin-top:6px;
-  }
-  .vial::before{
-    content:''; position:absolute; top:-8px; left:50%; transform:translateX(-50%);
-    width:12px; height:8px; background:var(--primary); border-radius:2px 2px 0 0;
-  }
-  .vial-fill{position:absolute; bottom:0; left:0; right:0; transition:height 0.3s ease;}
-  .card-body{flex:1; min-width:0;}
-  .card-top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
-  .card-title{font-weight:600; font-size:15px; color:var(--primary); line-height:1.25;}
-  .badge{
-    font-family:'IBM Plex Mono', monospace; font-size:10.5px; font-weight:600; letter-spacing:0.04em;
-    padding:3px 8px; border-radius:100px; white-space:nowrap; text-transform:uppercase;
-  }
-  .badge.ok{background:var(--ok-bg); color:var(--ok);}
-  .badge.warn{background:var(--warning-bg); color:var(--warning);}
-  .badge.crit{background:var(--critical-bg); color:var(--critical);}
-
-  .card-meta{margin-top:10px; display:flex; flex-direction:column; gap:5px; font-size:12.5px;}
-  .meta-row{display:flex; justify-content:space-between; color:var(--text-muted);}
-  .meta-row .val{font-family:'IBM Plex Mono', monospace; color:var(--text); font-weight:500;}
-  .meta-row .val.warn{color:var(--warning);}
-  .meta-row .val.crit{color:var(--critical);}
-
-  .card-actions{display:flex; gap:8px; margin-top:12px;}
-  .icon-btn{
-    background:var(--surface-2); border:1px solid var(--border); border-radius:6px;
-    width:28px; height:28px; display:flex; align-items:center; justify-content:center;
-    cursor:pointer; color:var(--text-muted); transition:all 0.15s;
-  }
-  .icon-btn:hover{background:var(--border); color:var(--primary);}
-
-  .empty{text-align:center; padding:60px 20px; color:var(--text-muted); grid-column:1/-1;}
-  .empty h3{color:var(--primary); margin-bottom:6px;}
-
-  .overlay{
-    position:fixed; inset:0; background:rgba(15,42,42,0.45); display:none;
-    align-items:center; justify-content:center; z-index:50; padding:20px;
-  }
-  .overlay.open{display:flex;}
-  .modal{
-    background:var(--surface); border-radius:14px; padding:26px; width:100%; max-width:440px;
-    box-shadow:0 20px 50px rgba(0,0,0,0.2);
-  }
-  .modal h2{font-size:19px; color:var(--primary); margin:0 0 18px;}
-  .field{margin-bottom:14px;}
-  .field label{display:block; font-size:12.5px; font-weight:600; color:var(--text-muted); margin-bottom:5px;}
-  .field input{
-    width:100%; padding:9px 12px; border-radius:7px; border:1px solid var(--border);
-    font-family:inherit; font-size:14px; color:var(--text); background:var(--surface-2);
-  }
-  .field input:focus{outline:2px solid var(--ice); outline-offset:0; border-color:var(--ice); background:#fff;}
-  .field-row{display:flex; gap:10px;}
-  .field-row .field{flex:1;}
-  .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:20px;}
-  .btn-ghost{
-    background:none; border:1px solid var(--border); padding:9px 16px; border-radius:8px;
-    font-family:inherit; font-size:13.5px; color:var(--text-muted); cursor:pointer;
-  }
-  .btn-danger{
-    background:none; border:1px solid var(--critical); color:var(--critical);
-    padding:9px 16px; border-radius:8px; font-family:inherit; font-size:13.5px; cursor:pointer; margin-right:auto;
-  }
-  .conn-banner{
-    background:var(--critical-bg); color:var(--critical); border:1px solid var(--critical);
-    padding:10px 14px; border-radius:8px; font-size:13px; margin-bottom:16px; display:none;
-  }
-  .conn-banner.show{display:block;}
-
-  /* LOGIN */
-  .login-card{
-    background:var(--surface); border:1px solid var(--border); border-radius:14px;
-    padding:34px 32px; width:100%; max-width:380px; box-shadow:0 20px 50px rgba(0,0,0,0.2);
-  }
-  .login-card .eyebrow{
-    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.1em;
-    text-transform:uppercase; color:var(--ice); font-weight:600; margin-bottom:8px;
-  }
-  .login-card h2{color:var(--primary); font-size:20px; margin:0 0 4px;}
-  .login-card .sub{color:var(--text-muted); font-size:13px; margin-bottom:22px;}
-  .login-error{
-    background:var(--critical-bg); color:var(--critical); font-size:12.5px;
-    padding:9px 12px; border-radius:7px; margin-bottom:14px; display:none;
-  }
-  .login-error.show{display:block;}
-  .btn-primary.full{width:100%; justify-content:center; margin-top:6px;}
-  .btn-primary:disabled{opacity:0.5; cursor:not-allowed;}
-  .auth-status{
-    display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono', monospace;
-    font-size:11.5px; color:var(--text-muted);
-  }
-  .auth-status button{
-    background:none; border:1px solid var(--border); border-radius:6px; padding:3px 10px;
-    font-family:inherit; font-size:11px; color:var(--primary); cursor:pointer;
-  }
-  .auth-status button:hover{background:var(--surface-2);}
-  .lock-icon{opacity:0.5; margin-left:5px;}
-
-  @media (max-width:640px){
-    .stats{grid-template-columns:repeat(2,1fr);}
-    .header{flex-direction:column; align-items:flex-start;}
-    .header-right{text-align:left;}
-  }
-</style>
+<script>
+  // Aplica o tema salvo (ou a preferência do sistema) antes da renderização, evitando flash de cor.
+  (function(){
+    var saved = localStorage.getItem('theme');
+    var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+  })();
+</script>
 </head>
 <body>
 
-<div class="overlay" id="loginOverlay">
-  <div class="login-card">
-    <div class="eyebrow">Rede de Frios · Login da equipe</div>
-    <h2>Entrar para editar</h2>
-    <div class="sub">A leitura do painel é aberta a todos. Login é necessário só para adicionar, editar ou excluir vacinas.</div>
+<div class="login-screen" id="loginScreen">
+  <button class="login-theme-toggle" id="btnLoginThemeToggle" title="Alternar tema" aria-label="Alternar tema">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.5a8.5 8.5 0 1 1-9-11 7 7 0 0 0 9 11Z"/></svg>
+  </button>
+
+  <!-- VIEW: entrar -->
+  <div class="login-card" id="viewSignIn">
+    <div class="login-mark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6l-1 4h-4L9 3Z"/><path d="M8 7h8a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V8a1 1 0 0 1 1-1Z"/><path d="M7 14h10"/></svg>
+    </div>
+    <div class="eyebrow">Rede de Frios · Controle de Imunobiológicos</div>
+    <h2>Núcleo de Vigilância Epidemiológica e Zoonoses</h2>
+    <div class="sub">Entre com sua conta da equipe para acessar o painel de estoque e validade de vacinas.</div>
     <div class="login-error" id="loginError">E-mail ou senha incorretos.</div>
     <div class="field">
       <label>E-mail</label>
@@ -217,14 +40,58 @@
       <label>Senha</label>
       <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
     </div>
-    <div class="modal-actions" style="justify-content:space-between;">
-      <button class="btn-ghost" id="btnCancelLogin">Cancelar</button>
-      <button class="btn-primary" id="btnLogin">Entrar</button>
+    <div class="login-links">
+      <button class="login-link" id="linkForgot">Esqueci minha senha</button>
     </div>
+    <button class="btn-primary full" id="btnLogin">Entrar</button>
+    <div class="login-switch">Ainda não tem conta? <button class="login-link" id="linkGoSignup">Criar conta</button></div>
+  </div>
+
+  <!-- VIEW: esqueci a senha -->
+  <div class="login-card" id="viewForgot" style="display:none;">
+    <div class="login-mark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5 12 14l9-5.5"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>
+    </div>
+    <div class="eyebrow">Rede de Frios · Recuperação de acesso</div>
+    <h2>Esqueci minha senha</h2>
+    <div class="sub">Informe o e-mail da sua conta. Vamos enviar um link para você criar uma nova senha.</div>
+    <div class="login-error" id="forgotError">Não foi possível enviar o e-mail.</div>
+    <div class="login-success" id="forgotSuccess">Se esse e-mail estiver cadastrado, enviamos um link de redefinição para ele.</div>
+    <div class="field">
+      <label>E-mail</label>
+      <input type="email" id="forgotEmail" placeholder="nucleo.zoonoses@gmail.com" autocomplete="username">
+    </div>
+    <button class="btn-primary full" id="btnSendReset">Enviar link de redefinição</button>
+    <div class="login-switch"><button class="login-link" id="linkBackFromForgot">Voltar para o login</button></div>
+  </div>
+
+  <!-- VIEW: criar conta -->
+  <div class="login-card" id="viewSignup" style="display:none;">
+    <div class="login-mark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+    </div>
+    <div class="eyebrow">Rede de Frios · Nova conta da equipe</div>
+    <h2>Criar conta</h2>
+    <div class="sub">Cadastre-se com o e-mail institucional da equipe para poder acessar e editar o painel.</div>
+    <div class="login-error" id="signupError">Não foi possível criar a conta.</div>
+    <div class="field">
+      <label>E-mail</label>
+      <input type="email" id="signupEmail" placeholder="nucleo.zoonoses@gmail.com" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="signupPassword" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+    </div>
+    <div class="field">
+      <label>Confirmar senha</label>
+      <input type="password" id="signupPasswordConfirm" placeholder="Repita a senha" autocomplete="new-password">
+    </div>
+    <button class="btn-primary full" id="btnSignup">Criar conta</button>
+    <div class="login-switch">Já tem conta? <button class="login-link" id="linkBackFromSignup">Entrar</button></div>
   </div>
 </div>
 
-<div class="app">
+<div class="app" id="dashboardApp" style="display:none;">
 
   <div class="header">
     <div>
@@ -233,12 +100,22 @@
       <div class="sub">Painel compartilhado de disponibilidade, estoque e validade de vacinas</div>
     </div>
     <div class="header-right">
-      <div><span class="sync-dot" id="syncDot"></span><span id="syncText">conectando ao banco de dados...</span></div>
-      <div id="lastUpdate" style="margin-top:4px;">—</div>
-      <div class="auth-status" style="margin-top:6px; justify-content:flex-end;">
-        <span id="authLabel">Modo leitura</span>
-        <button id="btnAuthToggle">Entrar</button>
+      <div class="header-controls">
+        <div class="theme-toggle" role="group" aria-label="Alternar tema">
+          <button id="btnThemeLight" title="Tema claro" aria-label="Tema claro">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg>
+          </button>
+          <button id="btnThemeDark" title="Tema escuro" aria-label="Tema escuro">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.5a8.5 8.5 0 1 1-9-11 7 7 0 0 0 9 11Z"/></svg>
+          </button>
+        </div>
+        <div class="auth-status">
+          <span id="authLabel"></span>
+          <button id="btnAuthToggle">Sair</button>
+        </div>
       </div>
+      <div class="status-line" style="margin-top:2px;"><span class="sync-dot" id="syncDot"></span><span id="syncText">conectando ao banco de dados...</span></div>
+      <div id="lastUpdate">—</div>
     </div>
   </div>
 
@@ -271,7 +148,7 @@
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Adicionar vacina
     </button>
-    <button class="btn-ghost" id="btnClearAll" style="display:none; border-color:var(--critical); color:var(--critical);">
+    <button class="btn-ghost" id="btnClearAll" style="border-color:var(--critical); color:var(--critical);">
       Excluir todos os itens
     </button>
   </div>
@@ -327,387 +204,6 @@
   </div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getFirestore, collection, onSnapshot, doc,
-  addDoc, updateDoc, deleteDoc, getDocs, writeBatch
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import {
-  getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut,
-  setPersistence, browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-// ============ CONFIGURAÇÃO DO FIREBASE ============
-const firebaseConfig = {
-  apiKey: "AIzaSyAL9UrzvklprF0qpgHdEH1LtL2JDKnyb5w",
-  authDomain: "dashboardrededefrios.firebaseapp.com",
-  projectId: "dashboardrededefrios",
-  storageBucket: "dashboardrededefrios.firebasestorage.app",
-  messagingSenderId: "666280337777",
-  appId: "1:666280337777:web:3cbd658e288a705ff096d0",
-  measurementId: "G-46L32RG3RB"
-};
-// ====================================================
-
-// ============ CATÁLOGO DE ITENS (Checklist SIES) ============
-const IMUNO_CATALOG = [{"name": "CLORETO DE SÓDIO, SOLUÇÃO INJETÁVEL - 0,9% - 10ML", "unit": "FRASCO"}, {"name": "DILUENTE PARA VACINA BCG - 10 DOSES", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA BCG - 20 DOSES", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA DUPLA VIRAL - 01 - DOSES", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA DUPLA VIRAL - 10 DOSES", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA DUPLA VIRAL - 02 DOSES", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA FEBRE AMARELA - 05 DOSES", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA FEBRE AMARELA - 10 DOSES", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA FEBRE AMARELA - 50 DOSES", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA HIB - 01 DOSE", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA MENINGO ACWY - 0,5 ML", "unit": "FRASCO"}, {"name": "DILUENTE PARA VACINA RAIVA (INATIVADA) - 01 DOSE", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA TETRAVIRAL - 01 DOSE", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA TRÍPLICE VIRAL - 10 DOSES", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA TRÍPLICE VIRAL - 02 DOSES", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA TRÍPLICE VIRAL - 05 DOSES", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA TRÍPLICE VIRAL - 01 DOSE", "unit": "AMPOLA"}, {"name": "DILUENTE PARA VACINA VARICELA - 01 DOSE", "unit": "AMPOLA"}, {"name": "DOSADOR PARA APLICAÇÃO DA VACINA CONTRA POLIOMIELITE ORAL (OPV) - 01", "unit": "UM"}, {"name": "IMUNOGLOBULINA HUMANA ANTI-HEPATITE B - 600 UI", "unit": "FRASCO"}, {"name": "IMUNOGLOBULINA HUMANA ANTI-HEPATITE B - 180 UI", "unit": "FRASCO"}, {"name": "IMUNOGLOBULINA HUMANA ANTI-HEPATITE B - 100 UI", "unit": "SERINGA"}, {"name": "IMUNOGLOBULINA HUMANA ANTI-HEPATITE B - 1000 UI", "unit": "SERINGA"}, {"name": "IMUNOGLOBULINA HUMANA ANTI-HEPATITE B - 200 UI", "unit": "SERINGA"}, {"name": "IMUNOGLOBULINA HUMANA ANTIRRÁBICA - 300 UI/2ML", "unit": "FRASCO"}, {"name": "IMUNOGLOBULINA HUMANA ANTITÉTANO - 250 UI - 1 ML", "unit": "FRASCO"}, {"name": "IMUNOGLOBULINA HUMANA ANTIVARICELA - 125UI", "unit": "FRASCO"}, {"name": "IMUNOGLOBULINA MONOCLONAL HUMANA CONTRA VIRUS SINCICIAL RESPIRATORIO - UM", "unit": "FRASCO"}, {"name": "NIRSEVIMABE 0,5ML - 0,5 ML", "unit": "SERINGA"}, {"name": "NIRSEVIMABE 1,0ML - 1,0 ML", "unit": "SERINGA"}, {"name": "PALIVIZUMABE PÓ LIÓFILO P/ INJETÁVEL - 100 MG", "unit": "FRASCO-AMPOLA"}, {"name": "PALIVIZUMABE PÓ LIÓFILO P/ INJETÁVEL - 50 MG", "unit": "FRASCO-AMPOLA"}, {"name": "PPD-RT-23 - C/ 15 TESTES", "unit": "UM"}, {"name": "PPD-RT-23 - C/ 50 TESTES", "unit": "UM"}, {"name": "PPD-RT-23 - C/ 10 TESTES", "unit": "UM"}, {"name": "SORO ANTIARACNÍDICO (LOXOSCELES, PHONEUTRIA, TITYUS) - 01 AMPOLA", "unit": "AMPOLA"}, {"name": "SORO ANTIBOTRÓPICO - 1 AMPOLA", "unit": "AMPOLA"}, {"name": "SORO ANTIBOTRÓPICO E ANTICROTÁLICO - 1 AMPOLA", "unit": "AMPOLA"}, {"name": "SORO ANTIBOTRÓPICO E ANTILAQUÉTICO - 1 AMPOLA", "unit": "FRASCO"}, {"name": "SORO ANTIBOTULÍNICO AB (BIVALENTE) - 20 ML", "unit": "AMPOLA"}, {"name": "SORO ANTICROTÁLICO - 1 AMPOLA", "unit": "AMPOLA"}, {"name": "SORO ANTIDIFTÉRICO - 1 AMPOLA", "unit": "AMPOLA"}, {"name": "SORO ANTIELAPÍDICO - 1 AMPOLA", "unit": "AMPOLA"}, {"name": "SORO ANTIESCORPIÔNICO - 1 AMPOLA", "unit": "AMPOLA"}, {"name": "SORO ANTILONÔMICO - 1 AMPOLA", "unit": "AMPOLA"}, {"name": "SORO ANTIRRÁBICO - 1 AMPOLA", "unit": "AMPOLA"}, {"name": "SORO ANTITETÂNICO - 1 AMPOLA", "unit": "FRASCO-AMPOLA"}, {"name": "VACINA BCG - 20 DOSES", "unit": "AMPOLA"}, {"name": "VACINA BCG - 10 DOSES", "unit": "AMPOLA"}, {"name": "VACINA CHIKUNGUNYA (RECOMBINANTE E ATENUADA) - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA CÓLERA ORAL - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA CÓLERA ORAL - 02 DOSE", "unit": "FRASCO"}, {"name": "VACINA CONTRA SARS-COV2 - 05 DOSES", "unit": "FRASCO"}, {"name": "VACINA CONTRA SARS-COV2 - 06 DOSES", "unit": "FRASCO"}, {"name": "VACINA CONTRA SARS-COV2 - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA CONTRA SARS-COV2 - 10 DOSES", "unit": "FRASCO"}, {"name": "VACINA CONTRA SARS-COV2 - 02 DOSES", "unit": "FRASCO"}, {"name": "VACINA CONTRA SARS-COV2 - PEDIÁTRICA - 06 DOSES", "unit": "FRASCO"}, {"name": "VACINA CONTRA SARS-COV2 - PEDIATRICA 03 DOSES - MENOR DE 5 ANOS", "unit": "FRASCO"}, {"name": "VACINA CONTRA SARS-COV2 - PEDIATRICA 10 DOSES - MENOR DE 5 ANOS", "unit": "FRASCO"}, {"name": "VACINA CONTRA SARS-COV2 - PEDIATRICA 10 DOSES - 10 DOSES", "unit": "FRASCO"}, {"name": "VACINA CONTRA SARS-COV2 ADULTO E ADOLESCENTE A PARTIR DE 12 ANOS - 30 MCG/DOSE - 06 DOSES", "unit": "FRASCO"}, {"name": "VACINA CONTRA SARS-COV2 BIVALENTE BA1 - 06 DOSES", "unit": "FRASCO"}, {"name": "VACINA CONTRA SARS-COV2 BIVALENTE BA4/BA5 - 06 DOSES", "unit": "FRASCO"}, {"name": "VACINA COVID-19-RECOMBINANTE, SERUM/ZALIKA - 05 DOSES", "unit": "FRASCO"}, {"name": "VACINA COVID-19-RNAM, MODERNA (SPIKEVAX) - 2,5 ML (05 ds)", "unit": "FRASCO-AMPOLA"}, {"name": "VACINA COVID-19-RNAM, MODERNA (SPIKEVAX) - 0,5 ML UNIDOSE", "unit": "SERINGA"}, {"name": "VACINA DENGUE (ATENUADA) - MONODOSE", "unit": "FRASCO-AMPOLA"}, {"name": "VACINA DIFTERIA E TÉTANO ADULTO - 10 DOSES", "unit": "FRASCO"}, {"name": "VACINA DIFTERIA E TÉTANO ADULTO - 05 DOSES", "unit": "FRASCO"}, {"name": "VACINA DIFTERIA E TÉTANO ADULTO - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA DIFTERIA E TÉTANO INFANTIL - 10 DOSES", "unit": "FRASCO"}, {"name": "VACINA DIFTERIA E TÉTANO INFANTIL - 01 DOSE", "unit": "AMPOLA"}, {"name": "VACINA DTP - 10 DOSES", "unit": "FRASCO"}, {"name": "VACINA DTPA - REF/ADULT 01 DS", "unit": "SERINGA"}, {"name": "VACINA DTPA - INFANTIL", "unit": "FRASCO"}, {"name": "VACINA DTPA - ADULTO", "unit": "FRASCO"}, {"name": "VACINA DTP/HIB - 10 DOSES", "unit": "FRASCO"}, {"name": "VACINA DTP/HIB - 05 DOSES", "unit": "FRASCO"}, {"name": "VACINA DTP/HIB - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA DTP/HIB - DOSES", "unit": "FRASCO"}, {"name": "VACINA DTP+HIB+POLIO INATIVA ( PENTA2 ) - 01 DOSE", "unit": "FRASCO-AMPOLA"}, {"name": "VACINA DUPLA VIRAL - 10 DOSES", "unit": "FRASCO"}, {"name": "VACINA DUPLA VIRAL - 01 DOSES", "unit": "FRASCO"}, {"name": "VACINA DUPLA VIRAL - 02 DOSES", "unit": "FRASCO"}, {"name": "VACINA FEBRE AMARELA - 10 DOSES", "unit": "FRASCO-AMPOLA"}, {"name": "VACINA FEBRE AMARELA - 50 DOSES", "unit": "FRASCO"}, {"name": "VACINA FEBRE AMARELA - 05 DOSES", "unit": "FRASCO"}, {"name": "VACINA FEBRE TIFÓIDE - 03 CAPSULAS", "unit": "CARTELA"}, {"name": "VACINA FEBRE TIFÓIDE - 05 DOSES", "unit": "FRASCO"}, {"name": "VACINA FEBRE TIFÓIDE - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA FEBRE TIFÓIDE - 20 DOSES", "unit": "FRASCO"}, {"name": "VACINA HEPATITE A ADULTO - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA HEPATITE A INFANTIL - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA HEPATITE B - 10 DOSES", "unit": "FRASCO"}, {"name": "VACINA HEXA ACELULAR (DTPA/HB/VIP/HIB) - 01 DOSE", "unit": "FRASCO-AMPOLA"}, {"name": "VACINA HIB - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA HPV QUADRIVALENTE - 0,5 ML", "unit": "SERINGA"}, {"name": "VACINA HPV QUADRIVALENTE - 0,5 ML-01 DOSE", "unit": "FRASCO-AMPOLA"}, {"name": "VACINA INATIVADA POLIOMIELITE - 10 DOSES", "unit": "FRASCO"}, {"name": "VACINA INFLUENZA TRIVALENTE - 01 DOSE", "unit": "FRASCO-AMPOLA"}, {"name": "VACINA INFLUENZA TRIVALENTE - 10 DOSES", "unit": "FRASCO-AMPOLA"}, {"name": "VACINA MENINGO ACWY - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA MENINGO ACWY - 05 DOSES", "unit": "FRASCO"}, {"name": "VACINA MENINGO ACWY - 01 DOSE SERINGA", "unit": "SERINGA"}, {"name": "VACINA MENINGO C - 01 DOSE", "unit": "SERINGA"}, {"name": "VACINA MENINGO C - 50 DOSES", "unit": "FRASCO"}, {"name": "VACINA MENINGO C - 05 DOSES", "unit": "FRASCO"}, {"name": "VACINA ORAL POLIOMIELITE BIVALENTE - 25 DOSES", "unit": "FRASCO"}, {"name": "VACINA ORAL POLIOMIELITE BIVALENTE - 20 DOSES", "unit": "FRASCO"}, {"name": "VACINA PENTA ACELULAR (DTPA/VIP/HIB) - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA PENTA (DTP/HB/HIB) - 10 DOSES", "unit": "FRASCO"}, {"name": "VACINA PENTA (DTP/HB/HIB) - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA PNEUMO 10 - 04 DOSES", "unit": "FRASCO-AMPOLA"}, {"name": "VACINA PNEUMO 10 - 01 DOSES", "unit": "FRASCO-AMPOLA"}, {"name": "VACINA PNEUMO 13 - 01 DOSE", "unit": "SERINGA"}, {"name": "VACINA PNEUMO 20 - 01 DOSE", "unit": "SERINGA"}, {"name": "VACINA PNEUMO 23 - 01 DOSE", "unit": "AMPOLA"}, {"name": "VACINA PNEUMO 7 - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA RAIVA - 01 DOSE", "unit": "AMPOLA"}, {"name": "VACINA RAIVA - 01 DOSE/COM DIL", "unit": "AMPOLA"}, {"name": "VACINA RAIVA EMBRIÃO DE GALINHA - 01 DOSE", "unit": "AMPOLA"}, {"name": "VACINA ROTAVÍRUS - 01", "unit": "BISNAGA"}, {"name": "VACINA TETRAVIRAL - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA TRÍPLICE VIRAL - 10 DOSES", "unit": "FRASCO-AMPOLA"}, {"name": "VACINA TRÍPLICE VIRAL - 05 DOSES", "unit": "FRASCO"}, {"name": "VACINA TRÍPLICE VIRAL - 02 DOSES", "unit": "FRASCO"}, {"name": "VACINA TRÍPLICE VIRAL - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA VARICELA - 01 DOSE", "unit": "FRASCO"}, {"name": "VACINA VARÍOLA SÍMIA (ATENUADA) - 01 DOSE 0,5 ML", "unit": "FRASCO"}, {"name": "VACINA VÍRUS SINCICIAL RESPIRATÓRIO A E B (RECOMBINANTE) - 01 DOSE", "unit": "FRASCO-AMPOLA"}, {"name": "VACINA VÍRUS SINCICIAL RESPIRATÓRIO (RECOMBINANTE, ADJUVADA) - 01 DOSE", "unit": "FRASCO-AMPOLA"}];
-const INSUMO_CATALOG = [{"name": "ÁGUA MINERAL - 500 ML", "unit": "UM"}, {"name": "AGULHA HIPODERMICA COM DISPOSITIVO DE SEGURANÇA 13 X 0,38 - 13 X 0,38", "unit": "UM"}, {"name": "AGULHA HIPODERMICA DESCART. ESTERIL - 25X7", "unit": "UM"}, {"name": "AGULHA HIPODERMICA DESCART. ESTERIL - 13X3,8", "unit": "UM"}, {"name": "AGULHA HIPODERMICA DESCART. ESTERIL - 30x7", "unit": "UM"}, {"name": "AGULHA HIPODERMICA DESCART. ESTERIL - 25X8", "unit": "UM"}, {"name": "AGULHA HIPODERMICA DESCART. ESTERIL - 13X4,5", "unit": "UM"}, {"name": "AGULHA HIPODERMICA DESCART. ESTERIL - 13X4", "unit": "UM"}, {"name": "AGULHA HIPODERMICA DESCART. ESTERIL - 0,9X20", "unit": "UM"}, {"name": "AGULHA HIPODERMICA DESCART. ESTERIL - 25X6", "unit": "UM"}, {"name": "AGULHA HIPODERMICA DESCART. ESTERIL - 25X10", "unit": "UM"}, {"name": "AGULHA HIPODERMICA DESCART. ESTERIL - 20X5,5", "unit": "UM"}, {"name": "AGULHA HIPODERMICA EM AÇO INOX SILICONIZADO PONTA BISEL CURTO TRIFACETADO - 23GX1", "unit": "UM"}, {"name": "AGULHA HIPODERMICA EM AÇO INOX SILICONIZADO PONTA BISEL CURTO TRIFACETADO - 22GX1", "unit": "UM"}, {"name": "AGULHA HIPODERMICA EM AÇO INOX SILICONIZADO PONTA BISEL CURTO TRIFACETADO - 24GX3/4", "unit": "UM"}, {"name": "AGULHA HIPODERMICA EM AÇO INOX SILICONIZADO PONTA BISEL CURTO TRIFACETADO - 24G X 20x5,5", "unit": "UM"}, {"name": "AGULHA 0,80X40MM - 21g X 11/2", "unit": "UM"}, {"name": "ÁLCOOL - FINO 70%", "unit": "UM"}, {"name": "ÁLCOOL - GEL 70%/190 G", "unit": "FRASCO"}, {"name": "ALGODÃO HIDRÓFILO - 500 MG", "unit": "UM"}, {"name": "BLOCO DE NOTAS - 01", "unit": "UM"}, {"name": "BOBINAS PARA CONSERVAÇÃO DE TEMP. EM CX TÉRMICA - 0,4 LITROS", "unit": "UM"}, {"name": "BOBINAS PARA CONSERVAÇÃO DE TEMP. EM CX TÉRMICA - 0,6 LITROS", "unit": "UM"}, {"name": "CAIXA COLETORA P/ DESCARTE DE ARTIGOS PERFURO/CORTANTE E CONTAMINADO - 01 - Grande", "unit": "UM"}, {"name": "CAIXA COLETORA P/ DESCARTE DE ARTIGOS PERFURO/CORTANTE E CONTAMINADO - 1 - Pequena", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 27 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 3 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 8 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 7 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 12 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 38 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 60 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 24 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 80 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 130 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 40 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 37 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 160 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 36 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 50 L", "unit": "UM"}, {"name": "CAIXA DE ISOPOR - 21 L", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 15 LT", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 24 LT", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 9,5 LT", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 48 LT", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 47,3 LT-TERMOM", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 34 LT-TERMOM", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 15,1 LT-TERMOM", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 56,7 LT-TERMOM", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 28 LT", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 9 LT-TERMOM", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 32 LT", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 12 LT", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 26 LT", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 8,5 LT-TERMOM", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 60 LT-TERMOM", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 50 LT-TERMOM", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 47 LT-TERMOM", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 15 LT-TERMOM", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO - 16 LT-TERMOM", "unit": "UM"}, {"name": "CAIXA TERMICA DE POLIURETANO 16L - 16 LITROS", "unit": "LITRO"}, {"name": "CAIXA TÉRMICA PARA TRANSPORTE DE IMUNIZANTE - 2,7 LITROS", "unit": "UM"}, {"name": "CAIXA TÉRMICA PARA TRANSPORTE DE VACINA C/ 24 BOBINAS - 20 LITROS", "unit": "UM"}, {"name": "CAIXA TÉRMICA PEQUENA P/ ACONDICIONAMENTO DE IMUNIZANTE - 7 LITROS", "unit": "UM"}, {"name": "CARTÃO - ESPELHO", "unit": "UM"}, {"name": "CARTAZES - CAMPANHA", "unit": "UM"}, {"name": "COPO DESCARTÁVEL - 300 ML", "unit": "UM"}, {"name": "COPO DESCARTÁVEL - 50 ML", "unit": "UM"}, {"name": "COPO DESCARTÁVEL - 200 ML", "unit": "UM"}, {"name": "DATALOGGER DE TEMPERATURA E UMIDADE COM SENSOR EXTERNO - 01", "unit": "UM"}, {"name": "FILME PLÁSTICO STRETCH 25 MICRAS - X 200M X50cm", "unit": "ROLO"}, {"name": "FITA ADESIVA - 50X50", "unit": "UM"}, {"name": "FITA ADESIVA - 25x50", "unit": "UM"}, {"name": "FITA ADESIVA - PP TR 48X50", "unit": "UM"}, {"name": "FITA ADESIVA DE PVC TRANSPARENTE - 12MM X 30MM", "unit": "UM"}, {"name": "GELO RECICLÁVEL - 500 ML", "unit": "UM"}, {"name": "GELO RECICLÁVEL - 550 ML", "unit": "UM"}, {"name": "GELO RECICLÁVEL - 1.000 ML", "unit": "UM"}, {"name": "GELO RECICLÁVEL - 700 ML", "unit": "UM"}, {"name": "IMPRESSO BOLETIM - MENSAL CRIE", "unit": "UM"}, {"name": "IMPRESSO BOLETIM - MES DOSE APLICA", "unit": "UM"}, {"name": "IMPRESSO CADERNETA - VACINA INFANTIL", "unit": "UM"}, {"name": "IMPRESSO CADERNETA - VACINA ADULTO", "unit": "UM"}, {"name": "IMPRESSO CADERNETA - VACINA MENINA", "unit": "UM"}, {"name": "IMPRESSO CADERNETA - VACINA MENINO", "unit": "UM"}, {"name": "IMPRESSO FORMULÁRIO - CONT. DIA.TEMP", "unit": "UM"}, {"name": "IMPRESSO FORMULÁRIO - MOV. MES. IMUNO", "unit": "UM"}, {"name": "IMPRESSO FORMULÁRIO - INUTIL. VACINA", "unit": "UM"}, {"name": "IMPRESSO FORMULÁRIO - MAPA DIA (AZUL)", "unit": "UM"}, {"name": "LÂMINA PARA MICROSCOPIA FOSCA FN NÃO LAPIDADA 26X76 MM - 1", "unit": "UMA"}, {"name": "LÂMINA PERFECTA ESPESSURA DE 1,0 A 1,2 MEDIDA 25,4X76,2MM - 1", "unit": "UMA"}, {"name": "LÂMINA PRECISION FOSCA LAPIDADA LÂMINA PRECISION, 26X76MM, FOSCA, LAPIDADA - 1", "unit": "UMA"}, {"name": "LANCETA DESCART. ESTERIL, COM SISTEMA PROTETOR - 28GX0,36MM", "unit": "UM"}, {"name": "LUVA DE PROCEDIMENTO LATEX NAO ESTÉRIL - C\\100 TAMANHO P", "unit": "CAIXA"}, {"name": "LUVA DE PROCEDIMENTO LATEX NAO ESTÉRIL - C\\100 TAMANHO G", "unit": "CAIXA"}, {"name": "LUVA NITRILICA - M", "unit": "UM"}, {"name": "LUVA NITRILICA - G", "unit": "UM"}, {"name": "LUVA NITRILICA - p", "unit": "UM"}, {"name": "MASCARA PFF2 BRANCA LF - 01", "unit": "UM"}, {"name": "MEMENTO TERAPEUTICO PARA VACINAS - 01", "unit": "UM"}, {"name": "PALETE - 1,20 x 1,00", "unit": "UM"}, {"name": "PALETE 440 PPL PLÁSTICO - 1", "unit": "UM"}, {"name": "PLÁSTICO BOLHA, ESPESSURA MÍNIMA 60 MICRAS - 65 cm x 1m", "unit": "ROLO"}, {"name": "PLÁSTICO BOLHA TRANSPARENTE - 1,30MX100M", "unit": "ROLO"}, {"name": "SACO PLASTICO - 15X25", "unit": "SACO"}, {"name": "SACO PLASTICO - 20X30", "unit": "SACO"}, {"name": "SACO PLÁSTICO - 30X50", "unit": "UM"}, {"name": "SACO PLÁSTICO - 100L", "unit": "UM"}, {"name": "SERINGA DESC. 1ML - AG. 25X7 - 1ML", "unit": "UM"}, {"name": "SERINGA DESCARTAVEL COM AGULHA E COM DISPOSITIVO DE SEGURANÇA - 3ML-25X6", "unit": "UM"}, {"name": "SERINGA DESCARTAVEL COM AGULHA 1 ML LUER LOCK - 23GX1", "unit": "UM"}, {"name": "SERINGA DESCARTAVEL COM AGULHA 1 ML LUER SLIP - 23GX1", "unit": "UM"}, {"name": "SERINGA DESCARTAVEL COM AGULHA 1 ML LUER SLIP - 30G 8X0,3", "unit": "UM"}, {"name": "SERINGA DESCARTÁVEL COM AGULHA 1 ML 13MMX0,3MM - 30Gx1/2", "unit": "UM"}, {"name": "SERINGA DESCARTÁVEL COM AGULHA 23GX1 - 0,3 ML", "unit": "UM"}, {"name": "SERINGA DESCARTÁVEL COM AGULHA 23GX1 - 0,5 ML", "unit": "UM"}, {"name": "SERINGA DESCARTAVEL COM AGULHA 3 ML LUER LOCK - 20X5,5 24G3/4", "unit": "UM"}, {"name": "SERINGA DESCARTAVEL COM AGULHA 3 ML LUER LOCK - 22GX1 25X0,70", "unit": "UM"}, {"name": "SERINGA DESCARTAVEL COM AGULHA 3 ML LUER LOCK - 26GX1/2 13X0,45", "unit": "UM"}, {"name": "SERINGA DESCARTAVEL COM AGULHA 3 ML LUER LOCK - 23GX1 25X0,60", "unit": "UM"}, {"name": "SERINGA DESCARTAVEL COM AGULHA 3 ML LUER SLIP - 23GX1", "unit": "UM"}, {"name": "SERINGA DESCARTAVEL COM AGULHA 5 ML LUER LOCK - 21GX1 25X0,80", "unit": "UM"}, {"name": "SERINGA DESCARTÁVEL SEM AGULHA 1 ML - BICO LUER SLIP", "unit": "UM"}, {"name": "SERINGA DESCARTÁVEL SEM AGULHA 1 ML - BICO LUER LOCK", "unit": "UM"}, {"name": "SERINGA DESCARTÁVEL SEM AGULHA 3 ML - BICO LUER SLIP", "unit": "UM"}, {"name": "SERINGA DESCARTÁVEL SEM AGULHA 3 ML - BICO LUER LOCK", "unit": "UM"}, {"name": "SERINGA DESCARTAVEL 3 ML COM AGULHA 26GX1/2 COM DISPOSITIVO DE SEGURANÇA - 0,45x13 MM", "unit": "UM"}, {"name": "SERINGA ESTERIAL DESCART. -1ML AG 25X7 UM - UM", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 3 ML C\\AG 22GX1", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 3ML C/AG 30X7", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 1ML C/AG 13X0,4", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 5ML C/AG 0,8X30", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 1ML 13X0,4", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 1 ML C\\AG 23GX1", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 3ML C/AG13X0,38", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 0,1mL - 27GX1/2", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 0,1mL - 27GX3/8", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 1ML C/AG 25X6", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 3mL AG 0,9X20mm", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 1ML C/AG 20X5,5", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 5ML C/AG 25X6", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 3ML C/AG 25X8", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 20ML", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 10ML", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 3ML C/AG 13X4,5", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 3ML C/AG 13X4", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 1ML C/AG 0,5X16", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 3ML C/AG 25X7", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 3ML C/AG 25X6", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 1ML C/AG 13X4,5", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 5ML", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 1ML", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 3ML C/AG 20X5,5", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 3ML", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 5ML C/AG 25X7", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 5ML C/AG 25X8", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 1ML GR AG13X3,8", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. - 1ML TB AG13X4,5", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. 0,05 ML - 26G X 3/8 - unidade", "unit": "UM"}, {"name": "SERINGA ESTERIL DESCART. 0,05 ML - 26G X 3/8 - UM", "unit": "UM"}, {"name": "SERINGA SEM LATEX COM AGULHA - 1CC 23GX1", "unit": "UM"}, {"name": "SUPLEMENTO PARA MEIO DE CULTURA LEITE DESNATADO EM PÓ (CHICKV) - 500g", "unit": "FRASCO"}, {"name": "TERMOMETRO - MAXIMA E MINIMA", "unit": "UM"}, {"name": "TERMOMETRO - C/CABO EXT.DIGI", "unit": "UM"}, {"name": "TERMOMETRO - C/CABO EXT.SIMP", "unit": "UM"}, {"name": "TERMÔMETRO DIGITAL DE MÁXIMA E MÍNIMA (-20+70/-50+70) - SH102", "unit": "UM"}, {"name": "TERMOMETRO DIGITAL INFRAVERMELHO COM MIRA LASER - UNI", "unit": "UM"}];
-const CATALOG_BY_NAME = {};
-[...IMUNO_CATALOG, ...INSUMO_CATALOG].forEach(it => { CATALOG_BY_NAME[it.name] = it.unit; });
-// ================================================================
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const vaccinesCol = collection(db, "vaccines");
-
-let vaccines = [];
-let isLoggedIn = false;
-
-setPersistence(auth, browserLocalPersistence);
-
-onAuthStateChanged(auth, user => {
-  isLoggedIn = !!user;
-  const authLabel = document.getElementById('authLabel');
-  const authBtn = document.getElementById('btnAuthToggle');
-  const clearAllBtn = document.getElementById('btnClearAll');
-  if(user){
-    authLabel.textContent = user.email;
-    authBtn.textContent = 'Sair';
-    clearAllBtn.style.display = 'inline-block';
-  }else{
-    authLabel.textContent = 'Modo leitura';
-    authBtn.textContent = 'Entrar';
-    clearAllBtn.style.display = 'none';
-  }
-  render();
-});
-
-document.getElementById('btnAuthToggle').addEventListener('click', () => {
-  if(isLoggedIn){
-    signOut(auth);
-  }else{
-    document.getElementById('loginOverlay').classList.add('open');
-  }
-});
-document.getElementById('btnCancelLogin').addEventListener('click', () => {
-  document.getElementById('loginOverlay').classList.remove('open');
-  document.getElementById('loginError').classList.remove('show');
-});
-document.getElementById('loginOverlay').addEventListener('click', e => {
-  if(e.target.id === 'loginOverlay') document.getElementById('loginOverlay').classList.remove('open');
-});
-document.getElementById('btnLogin').addEventListener('click', doLogin);
-document.getElementById('loginPassword').addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
-document.getElementById('loginEmail').addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
-
-async function doLogin(){
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  const errorBox = document.getElementById('loginError');
-  const btn = document.getElementById('btnLogin');
-  errorBox.classList.remove('show');
-  if(!email || !password){
-    errorBox.textContent = 'Preencha e-mail e senha.';
-    errorBox.classList.add('show');
-    return;
-  }
-  btn.disabled = true;
-  btn.textContent = 'Entrando...';
-  try{
-    await signInWithEmailAndPassword(auth, email, password);
-    document.getElementById('loginOverlay').classList.remove('open');
-    document.getElementById('loginEmail').value = '';
-    document.getElementById('loginPassword').value = '';
-  }catch(e){
-    errorBox.textContent = 'E-mail ou senha incorretos.';
-    errorBox.classList.add('show');
-  }finally{
-    btn.disabled = false;
-    btn.textContent = 'Entrar';
-  }
-}
-
-function daysUntil(dateStr){
-  if(!dateStr) return null;
-  const today = new Date(); today.setHours(0,0,0,0);
-  const d = new Date(dateStr + 'T00:00:00');
-  return Math.round((d - today) / 86400000);
-}
-
-function getStatus(v){
-  const qty = Number(v.quantity);
-  const min = Number(v.min) || 0;
-  const isInsumo = v.category === 'insumo';
-  const days = isInsumo ? null : daysUntil(v.expiry);
-  if(days !== null && days < 0) return 'crit';
-  if(qty <= 0) return 'crit';
-  if(days !== null && days <= 30) return 'crit';
-  if(qty < min) return 'warn';
-  if(days !== null && days <= 60) return 'warn';
-  return 'ok';
-}
-
-function statusLabel(status, v){
-  const isInsumo = v.category === 'insumo';
-  const days = isInsumo ? null : daysUntil(v.expiry);
-  if(days !== null && days < 0) return 'Vencido';
-  if(Number(v.quantity) <= 0) return 'Sem estoque';
-  if(status === 'crit') return 'Vence em breve';
-  if(status === 'warn' && Number(v.quantity) < Number(v.min)) return 'Estoque baixo';
-  if(status === 'warn') return 'Atenção validade';
-  return 'Disponível';
-}
-
-function escapeHtml(str){
-  const d = document.createElement('div');
-  d.textContent = str || '';
-  return d.innerHTML;
-}
-
-// ---- Real-time sync com o Firestore (leitura pública) ----
-onSnapshot(vaccinesCol, snapshot => {
-  vaccines = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-  document.getElementById('syncDot').classList.remove('off');
-  document.getElementById('syncText').textContent = 'sincronizado com a equipe';
-  document.getElementById('connBanner').classList.remove('show');
-  document.getElementById('lastUpdate').textContent = 'atualizado às ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  render();
-}, error => {
-  console.error(error);
-  document.getElementById('syncDot').classList.add('off');
-  document.getElementById('syncText').textContent = 'erro de conexão';
-  document.getElementById('connBanner').classList.add('show');
-});
-
-function render(){
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  const filter = document.getElementById('filterStatus').value;
-  const categoryFilter = document.getElementById('filterCategory').value;
-  const grid = document.getElementById('grid');
-
-  let list = vaccines.filter(v => (v.name||'').toLowerCase().includes(search));
-  if(filter !== 'all') list = list.filter(v => getStatus(v) === filter);
-  if(categoryFilter !== 'all') list = list.filter(v => (v.category || 'imuno') === categoryFilter);
-
-  let counts = {ok:0, warn:0, crit:0};
-  vaccines.forEach(v => counts[getStatus(v)]++);
-  document.getElementById('statTotal').textContent = vaccines.length;
-  document.getElementById('statOk').textContent = counts.ok;
-  document.getElementById('statWarn').textContent = counts.warn;
-  document.getElementById('statCrit').textContent = counts.crit;
-
-  if(list.length === 0){
-    grid.innerHTML = `<div class="empty">
-      <h3>${vaccines.length === 0 ? 'Nenhum item cadastrado ainda' : 'Nada encontrado'}</h3>
-      <p>${vaccines.length === 0 ? 'Adicione o primeiro item para começar a monitorar o estoque.' : 'Tente ajustar a busca ou os filtros.'}</p>
-    </div>`;
-    return;
-  }
-
-  grid.innerHTML = list.map(v => {
-    const status = getStatus(v);
-    const isInsumo = v.category === 'insumo';
-    const days = isInsumo ? null : daysUntil(v.expiry);
-    const min = Number(v.min) || 1;
-    const fillPct = Math.max(4, Math.min(100, Math.round((Number(v.quantity) / (min * 2 || 1)) * 100)));
-    const fillColor = status === 'crit' ? 'var(--critical)' : status === 'warn' ? 'var(--warning)' : 'var(--ok)';
-    let expiryText = '—';
-    let expiryClass = '';
-    if(!isInsumo && v.expiry){
-      const d = new Date(v.expiry + 'T00:00:00');
-      expiryText = d.toLocaleDateString('pt-BR');
-      if(days < 0){ expiryText += ' (vencida)'; expiryClass = 'crit'; }
-      else if(days <= 30){ expiryText += ` (${days}d)`; expiryClass = 'crit'; }
-      else if(days <= 60){ expiryText += ` (${days}d)`; expiryClass = 'warn'; }
-    }
-    const unitLabel = v.unit ? v.unit.toLowerCase() : 'un';
-    return `
-    <div class="card">
-      <div class="vial"><div class="vial-fill" style="height:${fillPct}%; background:${fillColor};"></div></div>
-      <div class="card-body">
-        <div class="card-top">
-          <div>
-            <div class="card-title">${escapeHtml(v.name)}</div>
-            <div style="font-size:10.5px; color:var(--text-muted); font-family:'IBM Plex Mono',monospace; margin-top:2px; text-transform:uppercase;">${isInsumo ? 'Insumo' : 'Imunobiológico'}</div>
-          </div>
-          <span class="badge ${status}">${statusLabel(status, v)}</span>
-        </div>
-        <div class="card-meta">
-          <div class="meta-row"><span>Estoque</span><span class="val ${Number(v.quantity) < Number(v.min) ? 'warn' : ''} mono">${v.quantity} ${unitLabel} ${v.min ? '(mín. ' + v.min + ')' : ''}</span></div>
-          ${!isInsumo ? `<div class="meta-row"><span>Validade</span><span class="val ${expiryClass} mono">${expiryText}</span></div>` : ''}
-          ${v.lot ? `<div class="meta-row"><span>Lote</span><span class="val mono">${escapeHtml(v.lot)}</span></div>` : ''}
-        </div>
-        <div class="card-actions">
-          ${isLoggedIn ? `<div class="icon-btn" data-edit="${v.id}" title="Editar">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
-          </div>` : ''}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-
-  grid.querySelectorAll('[data-edit]').forEach(el => {
-    el.addEventListener('click', () => openEdit(el.getAttribute('data-edit')));
-  });
-}
-
-// Popula os datalists de sugestões a partir do catálogo da planilha
-function populateDatalist(id, catalog){
-  const dl = document.getElementById(id);
-  dl.innerHTML = catalog.map(it => `<option value="${escapeHtml(it.name)}">`).join('');
-}
-populateDatalist('imunoSuggestions', IMUNO_CATALOG);
-populateDatalist('insumoSuggestions', INSUMO_CATALOG);
-
-function updateFormForCategory(){
-  const cat = document.getElementById('fCategory').value;
-  document.getElementById('fName').setAttribute('list', cat === 'insumo' ? 'insumoSuggestions' : 'imunoSuggestions');
-  document.getElementById('expiryField').style.display = cat === 'insumo' ? 'none' : 'block';
-}
-document.getElementById('fCategory').addEventListener('change', updateFormForCategory);
-
-// Ao digitar/selecionar um nome que existe no catálogo, preenche a unidade automaticamente
-document.getElementById('fName').addEventListener('input', () => {
-  const name = document.getElementById('fName').value;
-  if(CATALOG_BY_NAME[name]){
-    document.getElementById('fUnit').value = CATALOG_BY_NAME[name];
-  }
-});
-
-function openAdd(){
-  document.getElementById('modalTitle').textContent = 'Adicionar item';
-  document.getElementById('editId').value = '';
-  document.getElementById('fCategory').value = 'imuno';
-  document.getElementById('fName').value = '';
-  document.getElementById('fQty').value = '';
-  document.getElementById('fMin').value = '';
-  document.getElementById('fUnit').value = '';
-  document.getElementById('fExpiry').value = '';
-  document.getElementById('fLot').value = '';
-  document.getElementById('btnDelete').style.display = 'none';
-  updateFormForCategory();
-  document.getElementById('overlay').classList.add('open');
-}
-
-function openEdit(id){
-  const v = vaccines.find(x => x.id === id);
-  if(!v) return;
-  document.getElementById('modalTitle').textContent = 'Editar item';
-  document.getElementById('editId').value = v.id;
-  document.getElementById('fCategory').value = v.category || 'imuno';
-  document.getElementById('fName').value = v.name;
-  document.getElementById('fQty').value = v.quantity;
-  document.getElementById('fMin').value = v.min;
-  document.getElementById('fUnit').value = v.unit || '';
-  document.getElementById('fExpiry').value = v.expiry || '';
-  document.getElementById('fLot').value = v.lot || '';
-  document.getElementById('btnDelete').style.display = 'inline-block';
-  updateFormForCategory();
-  document.getElementById('overlay').classList.add('open');
-}
-
-function closeModal(){
-  document.getElementById('overlay').classList.remove('open');
-}
-
-async function saveForm(){
-  const id = document.getElementById('editId').value;
-  const name = document.getElementById('fName').value.trim();
-  if(!name){ alert('Informe o nome do item.'); return; }
-  const category = document.getElementById('fCategory').value;
-  const data = {
-    name,
-    category,
-    quantity: Number(document.getElementById('fQty').value) || 0,
-    min: Number(document.getElementById('fMin').value) || 0,
-    unit: document.getElementById('fUnit').value.trim(),
-    expiry: category === 'insumo' ? '' : document.getElementById('fExpiry').value,
-    lot: document.getElementById('fLot').value.trim()
-  };
-  const btn = document.getElementById('btnSave');
-  btn.disabled = true;
-  try{
-    if(id){
-      await updateDoc(doc(db, "vaccines", id), data);
-    }else{
-      await addDoc(vaccinesCol, data);
-    }
-    closeModal();
-  }catch(e){
-    console.error(e);
-    alert('Erro ao salvar. Verifique a conexão e as regras do Firestore.');
-  }finally{
-    btn.disabled = false;
-  }
-}
-
-async function deleteCurrent(){
-  const id = document.getElementById('editId').value;
-  if(!id) return;
-  if(!confirm('Excluir esta vacina do painel?')) return;
-  try{
-    await deleteDoc(doc(db, "vaccines", id));
-    closeModal();
-  }catch(e){
-    console.error(e);
-    alert('Erro ao excluir. Verifique a conexão e as regras do Firestore.');
-  }
-}
-
-async function clearAllItems(){
-  if(!isLoggedIn) return;
-  const total = vaccines.length;
-  if(total === 0){
-    alert('Não há itens cadastrados para excluir.');
-    return;
-  }
-  if(!confirm(`Isso vai excluir TODOS os ${total} itens cadastrados (imunobiológicos e insumos) para todo mundo que usa este painel. Essa ação não pode ser desfeita. Deseja continuar?`)) return;
-
-  const typed = prompt('Para confirmar, digite EXCLUIR (em maiúsculas):');
-  if(typed !== 'EXCLUIR'){
-    alert('Confirmação incorreta. Nenhum item foi excluído.');
-    return;
-  }
-
-  const btn = document.getElementById('btnClearAll');
-  btn.disabled = true;
-  btn.textContent = 'Excluindo...';
-  try{
-    const snapshot = await getDocs(vaccinesCol);
-    const docs = snapshot.docs;
-    // Firestore permite no máximo 500 operações por lote
-    for(let i = 0; i < docs.length; i += 450){
-      const batch = writeBatch(db);
-      docs.slice(i, i + 450).forEach(d => batch.delete(d.ref));
-      await batch.commit();
-    }
-    alert('Todos os itens foram excluídos.');
-  }catch(e){
-    console.error(e);
-    alert('Erro ao excluir os itens. Verifique a conexão e as regras do Firestore.');
-  }finally{
-    btn.disabled = false;
-    btn.textContent = 'Excluir todos os itens';
-  }
-}
-document.getElementById('btnClearAll').addEventListener('click', clearAllItems);
-
-document.getElementById('btnAdd').addEventListener('click', () => {
-  if(!isLoggedIn){
-    document.getElementById('loginOverlay').classList.add('open');
-    return;
-  }
-  openAdd();
-});
-document.getElementById('btnCancel').addEventListener('click', closeModal);
-document.getElementById('btnSave').addEventListener('click', saveForm);
-document.getElementById('btnDelete').addEventListener('click', deleteCurrent);
-document.getElementById('overlay').addEventListener('click', e => { if(e.target.id === 'overlay') closeModal(); });
-document.getElementById('searchInput').addEventListener('input', render);
-document.getElementById('filterStatus').addEventListener('change', render);
-document.getElementById('filterCategory').addEventListener('change', render);
-</script>
+<script type="module" src="/js/main.js"></script>
 </body>
 </html>
