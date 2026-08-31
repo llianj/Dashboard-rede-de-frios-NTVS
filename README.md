@@ -90,6 +90,4 @@ npm run preview
 - [ ] Tela de login dedicada
 - [ ] Revisão de design
 
-## Contexto
 
-Este projeto faz parte das atividades desenvolvidas por meio de um programa de bolsa, em conjunto com o site institucional de apresentação do NTVS.
