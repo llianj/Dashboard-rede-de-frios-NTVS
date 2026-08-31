@@ -1,6 +1,6 @@
 import '../css/style.css';
 
-import { initializeApp } from "firebase/app";
+import { initializeApp, deleteApp } from "firebase/app";
 import {
   getFirestore, collection, onSnapshot, doc,
   addDoc, updateDoc, deleteDoc, getDocs, writeBatch
@@ -38,20 +38,16 @@ document.getElementById('btnLoginThemeToggle').addEventListener('click', () => {
   applyTheme(current === 'light' ? 'dark' : 'light');
 });
 
-// ---- Alternância entre telas de login / esqueci senha / criar conta ----
+// ---- Alternância entre telas de login / esqueci senha ----
 function showLoginView(view){
   document.getElementById('viewSignIn').style.display = view === 'signin' ? 'block' : 'none';
   document.getElementById('viewForgot').style.display = view === 'forgot' ? 'block' : 'none';
-  document.getElementById('viewSignup').style.display = view === 'signup' ? 'block' : 'none';
   document.getElementById('loginError').classList.remove('show');
   document.getElementById('forgotError').classList.remove('show');
   document.getElementById('forgotSuccess').classList.remove('show');
-  document.getElementById('signupError').classList.remove('show');
 }
 document.getElementById('linkForgot').addEventListener('click', () => showLoginView('forgot'));
-document.getElementById('linkGoSignup').addEventListener('click', () => showLoginView('signup'));
 document.getElementById('linkBackFromForgot').addEventListener('click', () => showLoginView('signin'));
-document.getElementById('linkBackFromSignup').addEventListener('click', () => showLoginView('signin'));
 
 setPersistence(auth, browserLocalPersistence);
 
@@ -144,18 +140,36 @@ async function doSendReset(){
   }
 }
 
-// ---- Criar conta ----
-document.getElementById('btnSignup').addEventListener('click', doSignup);
-[document.getElementById('signupEmail'), document.getElementById('signupPassword'), document.getElementById('signupPasswordConfirm')]
-  .forEach(el => el.addEventListener('keydown', e => { if(e.key === 'Enter') doSignup(); }));
+// ---- Cadastro de novo usuário (somente para quem já está logado) ----
+// Usamos uma instância secundária do Firebase Auth para criar o usuário sem
+// derrubar a sessão de quem está logado (createUserWithEmailAndPassword loga
+// automaticamente como o usuário recém-criado na instância em que é chamado).
+function openUserOverlay(){
+  if(!isLoggedIn) return;
+  document.getElementById('newUserEmail').value = '';
+  document.getElementById('newUserPassword').value = '';
+  document.getElementById('newUserPasswordConfirm').value = '';
+  document.getElementById('newUserError').classList.remove('show');
+  document.getElementById('newUserSuccess').classList.remove('show');
+  document.getElementById('userOverlay').classList.add('open');
+}
+function closeUserOverlay(){
+  document.getElementById('userOverlay').classList.remove('open');
+}
+document.getElementById('btnManageUsers').addEventListener('click', openUserOverlay);
+document.getElementById('btnCancelNewUser').addEventListener('click', closeUserOverlay);
+document.getElementById('userOverlay').addEventListener('click', e => { if(e.target.id === 'userOverlay') closeUserOverlay(); });
 
-async function doSignup(){
-  const email = document.getElementById('signupEmail').value.trim();
-  const password = document.getElementById('signupPassword').value;
-  const confirm = document.getElementById('signupPasswordConfirm').value;
-  const errorBox = document.getElementById('signupError');
-  const btn = document.getElementById('btnSignup');
+async function doCreateUser(){
+  if(!isLoggedIn) return; // reforça: só usuário já autenticado pode chegar aqui
+  const email = document.getElementById('newUserEmail').value.trim();
+  const password = document.getElementById('newUserPassword').value;
+  const confirm = document.getElementById('newUserPasswordConfirm').value;
+  const errorBox = document.getElementById('newUserError');
+  const successBox = document.getElementById('newUserSuccess');
+  const btn = document.getElementById('btnCreateUser');
   errorBox.classList.remove('show');
+  successBox.classList.remove('show');
 
   if(!email || !password || !confirm){
     errorBox.textContent = 'Preencha todos os campos.';
@@ -174,13 +188,16 @@ async function doSignup(){
   }
 
   btn.disabled = true;
-  btn.textContent = 'Criando conta...';
+  btn.textContent = 'Criando...';
+
+  const secondaryApp = initializeApp(firebaseConfig, 'SecondaryUserCreation-' + Date.now());
+  const secondaryAuth = getAuth(secondaryApp);
   try{
-    await createUserWithEmailAndPassword(auth, email, password);
-    // onAuthStateChanged cuida de levar para o dashboard automaticamente.
-    document.getElementById('signupEmail').value = '';
-    document.getElementById('signupPassword').value = '';
-    document.getElementById('signupPasswordConfirm').value = '';
+    await createUserWithEmailAndPassword(secondaryAuth, email, password);
+    successBox.classList.add('show');
+    document.getElementById('newUserEmail').value = '';
+    document.getElementById('newUserPassword').value = '';
+    document.getElementById('newUserPasswordConfirm').value = '';
   }catch(e){
     if(e.code === 'auth/email-already-in-use'){
       errorBox.textContent = 'Já existe uma conta com esse e-mail.';
@@ -191,10 +208,15 @@ async function doSignup(){
     }
     errorBox.classList.add('show');
   }finally{
+    try{ await signOut(secondaryAuth); }catch(_e){}
+    try{ await deleteApp(secondaryApp); }catch(_e){}
     btn.disabled = false;
-    btn.textContent = 'Criar conta';
+    btn.textContent = 'Criar usuário';
   }
 }
+document.getElementById('btnCreateUser').addEventListener('click', doCreateUser);
+[document.getElementById('newUserEmail'), document.getElementById('newUserPassword'), document.getElementById('newUserPasswordConfirm')]
+  .forEach(el => el.addEventListener('keydown', e => { if(e.key === 'Enter') doCreateUser(); }));
 
 function daysUntil(dateStr){
   if(!dateStr) return null;
